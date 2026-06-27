@@ -1,0 +1,11 @@
+first name,last name,phone,email,brokerage,community,notes
+Jordan,Pierce,(704) 555-0142,jordan.pierce@kwrealty.com,Keller Williams,Ballantyne,Met at open house
+Mara,Nguyen,704-555-0188,mara@cltrealty.com,CLT Realty,Dilworth,Investor focus
+Devon,Hill,+17045550173,devon.hill@compass.com,Compass,South End,Prefers email
+Priya,Shah,7045550199,priya.shah@remax.com,RE/MAX,University City,
+Carlos,Mendez,(704) 555 0121,carlos@exprealty.com,eXp Realty,NoDa,High volume
+Taylor,Brooks,704.555.0166,taylor.brooks@kwrealty.com,Keller Williams,Plaza Midwood,
+Sam,Okafor,17045550155,sam.okafor@compass.com,Compass,Ballantyne,Referral source
+Riley,Watson,704-555-0102,,Allen Tate,Matthews,No email on file
+Avery,Cole,bad-number,avery@cltrealty.com,CLT Realty,Dilworth,Should be skipped
+Morgan,Diaz,704-555-0188,morgan@dup.com,Dup Brokerage,Test,Duplicate phone of Mara
