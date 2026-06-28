@@ -35,3 +35,19 @@ body {
   background: #e3ddd2;
   border-radius: 8px;
 }
+
+/* Shared input style for the public offers form */
+.input {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e3ddd2;
+  background: #fbfaf8;
+  padding: 0.5rem 0.75rem;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus {
+  border-color: #c4633b;
+  background: #ffffff;
+}
