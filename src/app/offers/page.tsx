@@ -81,7 +81,7 @@ export default function OffersPage() {
       {/* Top bar */}
       <header className="flex items-center justify-between bg-ink px-5 py-3.5 md:px-8">
         <div className="flex items-baseline gap-2">
-          <span className="text-lg font-bold tracking-tight text-paper">ALAGO</span>
+          <span className="text-lg font-bold tracking-tight text-paper">LENNAR</span>
           <span className="text-[11px] uppercase tracking-[0.18em] text-paper/50">
             Houston
           </span>
@@ -107,27 +107,14 @@ export default function OffersPage() {
           </p>
 
           {/*
-            HERO IMAGE PLACEHOLDER
-            Replace the <div> below with your own photo or a licensed stock image:
-              <img
-                src="/hero-home.jpg"
-                alt="New construction home in Houston"
-                className="mt-7 h-52 w-full rounded-xl object-cover border border-line"
-              />
-            Put the image file in the project's /public folder (e.g. public/hero-home.jpg).
-            Do NOT use Lennar's own renderings unless Kenzie confirms you have rights.
+            HERO IMAGE — Carter's own photo (he took it, so it's safe to use).
+            File lives at /public/hero-home.jpg
           */}
-          <div className="mt-7 flex h-52 w-full items-center justify-center rounded-xl border border-dashed border-line bg-line/30 text-center">
-            <div className="px-4">
-              <div className="text-2xl text-muted/60">🏠</div>
-              <div className="mt-1 text-xs font-medium text-muted">
-                Home photo goes here
-              </div>
-              <div className="text-[11px] text-muted/70">
-                Add your own or a licensed image
-              </div>
-            </div>
-          </div>
+          <img
+            src="/hero-home.jpg"
+            alt="New construction homes in Houston"
+            className="mt-7 h-52 w-full rounded-xl border border-line object-cover"
+          />
 
           <div className="mt-8 space-y-5 border-t border-line pt-7">
             {VALUE_PROPS.map((v) => (
