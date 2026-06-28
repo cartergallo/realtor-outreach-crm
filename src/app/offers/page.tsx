@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Keep this wording identical to CONSENT_TEXT in /api/optin/route.ts —
 // it is the legal record of what the person agreed to.
@@ -36,8 +36,25 @@ export default function OffersPage() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Mobile popup state
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupDismissed, setPopupDismissed] = useState(false);
+
   function set(k: string, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  // Show the popup after 3s — mobile only, once per session, not if already done/dismissed.
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (!isMobile || done || popupDismissed) return;
+    const t = setTimeout(() => setShowPopup(true), 3000);
+    return () => clearTimeout(t);
+  }, [done, popupDismissed]);
+
+  function closePopup() {
+    setShowPopup(false);
+    setPopupDismissed(true);
   }
 
   async function submit(e: React.FormEvent) {
@@ -56,8 +73,103 @@ export default function OffersPage() {
     const json = await res.json();
     setBusy(false);
     if (!res.ok) return setError(json.error ?? "Something went wrong.");
+    setShowPopup(false);
     setDone(true);
   }
+
+  // Shared form, used both inline (desktop) and inside the mobile popup.
+  const formEl = (
+    <form onSubmit={submit}>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="First name">
+          <input
+            value={form.first_name}
+            onChange={(e) => set("first_name", e.target.value)}
+            className="input"
+          />
+        </Field>
+        <Field label="Last name">
+          <input
+            value={form.last_name}
+            onChange={(e) => set("last_name", e.target.value)}
+            className="input"
+          />
+        </Field>
+      </div>
+
+      <div className="mt-2.5">
+        <Field label="Mobile number">
+          <input
+            required
+            type="tel"
+            value={form.phone}
+            onChange={(e) => set("phone", e.target.value)}
+            placeholder="(713) 555-0142"
+            className="input"
+          />
+        </Field>
+      </div>
+
+      <div className="mt-2.5">
+        <Field label="Email">
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => set("email", e.target.value)}
+            className="input"
+          />
+        </Field>
+      </div>
+
+      <div className="mt-2.5">
+        <Field label="Brokerage">
+          <input
+            value={form.brokerage}
+            onChange={(e) => set("brokerage", e.target.value)}
+            className="input"
+          />
+        </Field>
+      </div>
+
+      {/* Honeypot */}
+      <input
+        tabIndex={-1}
+        autoComplete="off"
+        value={hp}
+        onChange={(e) => setHp(e.target.value)}
+        name="company_website"
+        className="hidden"
+        aria-hidden="true"
+      />
+
+      <label className="mt-4 flex gap-2.5 text-[11px] leading-relaxed text-muted">
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+          className="mt-0.5 shrink-0 accent-clay"
+        />
+        <span>{CONSENT_TEXT}</span>
+      </label>
+
+      {error && (
+        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={busy}
+        className="mt-4 w-full rounded-lg bg-clay px-4 py-3 text-[15px] font-semibold text-white transition hover:bg-clayd disabled:opacity-50"
+      >
+        {busy ? "Signing you up…" : "Send me the offers"}
+      </button>
+      <p className="mt-3 text-center text-[11px] text-muted">
+        No spam. Opt out anytime.
+      </p>
+    </form>
+  );
 
   if (done) {
     return (
@@ -109,11 +221,12 @@ export default function OffersPage() {
           {/*
             HERO IMAGE — Carter's own photo (he took it, so it's safe to use).
             File lives at /public/hero-home.jpg
+            Wide streetscape photo: show it in full (no crop), let height be natural.
           */}
           <img
             src="/hero-home.jpg"
             alt="New construction homes in Houston"
-            className="mt-7 h-52 w-full rounded-xl border border-line object-cover"
+            className="mt-7 w-full rounded-xl border border-line"
           />
 
           <div className="mt-8 space-y-5 border-t border-line pt-7">
@@ -133,103 +246,13 @@ export default function OffersPage() {
           </div>
         </section>
 
-        {/* Right — form */}
+        {/* Right — inline form (desktop + mobile fallback) */}
         <section className="flex flex-col justify-center border-t border-line bg-white px-6 py-10 md:border-l md:border-t-0 md:px-8 md:py-12">
           <h2 className="text-lg font-bold tracking-tight text-ink">
             Get the offers by text
           </h2>
           <p className="mb-5 text-sm text-muted">Free for agents. Takes 20 seconds.</p>
-
-          <form onSubmit={submit}>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="First name">
-                <input
-                  value={form.first_name}
-                  onChange={(e) => set("first_name", e.target.value)}
-                  className="input"
-                />
-              </Field>
-              <Field label="Last name">
-                <input
-                  value={form.last_name}
-                  onChange={(e) => set("last_name", e.target.value)}
-                  className="input"
-                />
-              </Field>
-            </div>
-
-            <div className="mt-2.5">
-              <Field label="Mobile number">
-                <input
-                  required
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => set("phone", e.target.value)}
-                  placeholder="(713) 555-0142"
-                  className="input"
-                />
-              </Field>
-            </div>
-
-            <div className="mt-2.5">
-              <Field label="Email">
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => set("email", e.target.value)}
-                  className="input"
-                />
-              </Field>
-            </div>
-
-            <div className="mt-2.5">
-              <Field label="Brokerage">
-                <input
-                  value={form.brokerage}
-                  onChange={(e) => set("brokerage", e.target.value)}
-                  className="input"
-                />
-              </Field>
-            </div>
-
-            {/* Honeypot */}
-            <input
-              tabIndex={-1}
-              autoComplete="off"
-              value={hp}
-              onChange={(e) => setHp(e.target.value)}
-              name="company_website"
-              className="hidden"
-              aria-hidden="true"
-            />
-
-            <label className="mt-4 flex gap-2.5 text-[11px] leading-relaxed text-muted">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 shrink-0 accent-clay"
-              />
-              <span>{CONSENT_TEXT}</span>
-            </label>
-
-            {error && (
-              <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={busy}
-              className="mt-4 w-full rounded-lg bg-clay px-4 py-3 text-[15px] font-semibold text-white transition hover:bg-clayd disabled:opacity-50"
-            >
-              {busy ? "Signing you up…" : "Send me the offers"}
-            </button>
-            <p className="mt-3 text-center text-[11px] text-muted">
-              No spam. Opt out anytime.
-            </p>
-          </form>
+          {formEl}
         </section>
       </div>
 
@@ -245,6 +268,41 @@ export default function OffersPage() {
           <span className="font-semibold text-ink">Houston</span> metro communities
         </span>
       </footer>
+
+      {/* Mobile-only popup, appears after 3s */}
+      {showPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 px-3 pb-3 md:hidden"
+          role="dialog"
+          aria-modal="true"
+          onClick={closePopup}
+        >
+          <div
+            className="max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-white p-5 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold leading-tight tracking-tight text-ink">
+                  Get agent commission offers texted directly to you
+                </h2>
+                <p className="mt-1 text-sm text-muted">
+                  Free for agents. Takes 20 seconds.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closePopup}
+                aria-label="Close"
+                className="-mr-1 -mt-1 shrink-0 rounded-full p-1.5 text-xl leading-none text-muted hover:bg-line/50"
+              >
+                ✕
+              </button>
+            </div>
+            {formEl}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
